@@ -273,41 +273,34 @@ int start_camera_capture()
 int stop_camera_capture()
 {
   int rc = MM_CAMERA_OK;
-  CameraObj* camera = &gTheCamera;
+  CameraObj *camera = &gTheCamera;
 
-  switch(gTheCamera.pixel_format)
+  switch (gTheCamera.pixel_format)
   {
-    // For now bayer and rgb888 are the same
-    // since we downsample bayer to rgb
-    case ANKI_CAM_FORMAT_BAYER_MIPI_BGGR10:
-    case ANKI_CAM_FORMAT_RGB888:
-    {
+    case ANKI_CAM_FORMAT_BAYER_MIPI_BGGR10:      //0
+    case ANKI_CAM_FORMAT_BAYER_MIPI_BGGR10_2MP:  //3
+    case ANKI_CAM_FORMAT_RGB888:                 //1
+    case ANKI_CAM_FORMAT_RGB888_2MP:             //4
       rc = victor_stop_rdi(&(camera->lib_handle.test_obj));
-    }
-    break;
-
-    case ANKI_CAM_FORMAT_RGB888_2MP:
-    {
-      rc = victor_stop_rdi(&(camera->lib_handle.test_obj));
-    }
-    break;
-
-    case ANKI_CAM_FORMAT_YUV:
-    {
+      break;
+    case ANKI_CAM_FORMAT_YUV:                    //2
+    case ANKI_CAM_FORMAT_YUV_2MP:                //5
       rc = victor_stop_preview(&(camera->lib_handle.test_obj));
-      camera->lib_handle.stream_running = 0;
-    }
-    break;
+      break;
 
-    case ANKI_CAM_FORMAT_YUV_2MP:
-    {
-      rc = victor_stop_preview(&(camera->lib_handle.test_obj));
-      camera->lib_handle.stream_running = 0;
-    }
-    break;
+    default:
+      CDBG_ERROR("%s: weird pixel_format %d", __func__,
+                 gTheCamera.pixel_format);
+      rc = -1;
+      break;
   }
+
+  if (rc == MM_CAMERA_OK)
+    camera->lib_handle.stream_running = 0;
+
   return rc;
 }
+
 
 int camera_start_snapshot()
 {
