@@ -1,8 +1,8 @@
-# vicos-oelinux
+# vicos-oelinux-1.6-nosign
 
 This repository contains the embedded OS that runs on victor hardware.
-If you are looking for victor embedded firmware, robotics, animation and engine layers checkout [victor](https://github.com/kercre123/victor).
-`vicos-oelinux` *is* the repo you are looking for if you want to create a full OTA. It includes stuff like victor as submodules.
+If you are looking for victor embedded firmware, robotics, animation and engine layers checkout [victor-1.6-rebuild](https://github.com/Switch-modder/victor-1.6-rebuild).
+`vicos-oelinux-1.6-nosign` *is* the repo you are looking for if you want to create a full OTA. It includes stuff like victor as submodules.
 
 ## Build Instructions
 
@@ -17,7 +17,7 @@ git git-lfs docker
 
 Clone git repository:
 ```
-git clone --recurse-submodules --shallow-submodules https://github.com/kercre123/vicos-oelinux-nosign --depth=1
+git clone --recurse-submodules --shallow-submodules https://github.com/Switch-modder/vicos-oelinux-1.6-nosign --depth=1
 ```
 
 Configure Docker so it can be run by a normal user (it is not recommended to run the build script as root):
@@ -31,7 +31,7 @@ sudo chmod 660 /var/run/docker.sock
 
 Start Build:
 ```
-cd vicos-oelinux
+cd vicos-oelinux-1.6-nosign
 ./build/docker-ota-build.sh <oskr/dev> <increment> <oskr boot image password>
 # boot image password not necessary for dev
 ```
@@ -43,7 +43,8 @@ Example:
 ./build/docker-ota-build.sh prod 6080 <OTA password> <prod boot image password>
 ```
 
-This will create an OTA called vicos-2.0.1.6080.ota in vicos-oelinux/_build/ which will run on prod bots.
+This will create an OTA called vicos-1.6.1.6080.ota in vicos-oelinux/_build/. While yes this ota is installable on any bot it will NOT include the /anki folder as it doesn't build /anki.
+After the ota is finished building run the script at ./build/inject-anki.sh to add the 1.6 /anki folder in. I'm sorry this is so jank but I don't have another working way to do it.
 This is scriptable - it will not prompt for anything.
 
 ### Suffix key:
