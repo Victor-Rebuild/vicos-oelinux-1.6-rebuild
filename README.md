@@ -45,7 +45,7 @@ Example:
 
 This will create an OTA called vicos-1.6.1.6080.ota in vicos-oelinux/_build/. While yes this ota is installable on any bot it will NOT include the /anki folder as it doesn't build /anki.
 After the ota is finished building run the script at ./build/inject-anki.sh to add the 1.6 /anki folder in. I'm sorry this is so jank but I don't have another working way to do it.
-This is scriptable - it will not prompt for anything.
+This is scriptable for dev builds because a password will be needed afterwards in order to inject /anki - for dev it will not prompt for anything.
 
 ### Suffix key:
 
