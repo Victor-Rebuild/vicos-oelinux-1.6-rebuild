@@ -31,7 +31,10 @@ IMAGE_INSTALL += "vic-robot"
 IMAGE_INSTALL += "vic-switchboard"
 IMAGE_INSTALL += "vic-webserver"
 IMAGE_INSTALL += "vic-bootanim"
-IMAGE_INSTALL += "victor"
+
+# Comment out victor so it can be injected after
+# IMAGE_INSTALL += "victor"
+
 #
 # Other stuff
 IMAGE_INSTALL += "bspatch"
