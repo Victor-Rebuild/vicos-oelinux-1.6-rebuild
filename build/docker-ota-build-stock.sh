@@ -138,8 +138,6 @@ if [[ ${NO_TTY} == "1" ]]; then
 	BUILD_ARGS_TERM="-t"
 fi
 
-rm -rf _build/
-
 docker build --build-arg UID=$(id -u $USER) --build-arg GID=$(id -g $USER) -t victor-oe-builder build/
 
 docker run ${BUILD_ARGS_TERM} \
@@ -151,10 +149,6 @@ docker run ${BUILD_ARGS_TERM} \
     -v "$(pwd)/anki-deps:/home/build/.anki" \
     -v "$(pwd)/build/cache/ccache:/home/build/.ccache" \
     victor-oe-builder bash -c "cd ~/vicos-oelinux/poky && rm -rf build/tmp-glibc/deploy/images/apq8009-robot-robot-perf/* && source build/conf/set_bb_env.sh && export ANKI_BUILD_VERSION=$INCREMENT && source ~/vicos-oelinux/poky/build/conf/set_anki_build_version.sh && setenv-8009-robot-image$PERForUSER && bitbake -c cleanall victor anki-version rampost base-files wired iptables machine-robot-image core-image-anki-initramfs && $ToDo && export OTA_MANIFEST_SIGNING_KEY=$OTA_SIGNING_PASSWORD && ANKIDEV=$ADEV DO_SIGN=$DO_SIGN make && exit 0"
-
-export RUN_FROM_MAIN=1
-
-./build/inject-anki.sh
 
 echo
 echo -e "\033[1;32mComplete. Your $PRODorOSKR OTA is in $(pwd)/_build/$OTA_NAME.\033[0m"

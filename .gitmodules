@@ -10,3 +10,6 @@
 [submodule "anki/victor"]
 	path = anki/victor
 	url = https://github.com/kercre123/victor
+[submodule "anki/victor-1.6"]
+	path = anki/victor-1.6
+	url = https://github.com/Switch-modder/victor-1.6-rebuild
