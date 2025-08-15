@@ -100,7 +100,7 @@ if [[ ${PRODorOSKR} == "prod" ]]; then
     PERForUSER="-user"
 elif [[ ${PRODorOSKR} == "ep" ]]; then
     echo "Building an EP image"
-    ToDo="build-victor-robot-ep-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
+    ToDo="build-victor-robot-escapepod-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
     ADEV=0
     check_sign_prod
     OTA_NAME=vicos-$(cat ANKI_VERSION).${INCREMENT}ep.ota
@@ -110,6 +110,20 @@ elif [[ ${PRODorOSKR} == "dev" ]]; then
     ToDo="build-victor-robot-perf-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make devsign"
     ADEV=1
     OTA_NAME=vicos-$(cat ANKI_VERSION).${INCREMENT}d.ota
+    PERForUSER="-perf"
+elif [[ ${PRODorOSKR} == "proddev" ]]; then
+    echo "Building a proddev image"
+    ToDo="build-victor-robot-perf-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
+    ADEV=0
+    check_sign_prod
+    OTA_NAME=vicos-$(cat ANKI_VERSION).${INCREMENT}.ota
+    PERForUSER="-perf"
+elif [[ ${PRODorOSKR} == "epdev" ]]; then
+    echo "Building a dev image"
+    ToDo="build-victor-robot-epdev-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
+    ADEV=0
+    check_sign_prod
+    OTA_NAME=vicos-$(cat ANKI_VERSION).${INCREMENT}ep.ota
     PERForUSER="-perf"
 else
     echo "Building an OSKR image"
@@ -138,7 +152,7 @@ if [[ ${NO_TTY} == "1" ]]; then
 	BUILD_ARGS_TERM="-t"
 fi
 
-rm -rf _build/
+rm -rf _build/*.ota
 
 docker build --build-arg UID=$(id -u $USER) --build-arg GID=$(id -g $USER) -t victor-oe-builder build/
 

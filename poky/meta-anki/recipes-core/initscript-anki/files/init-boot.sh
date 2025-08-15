@@ -35,26 +35,26 @@ if [ -z "${CMDLINE##*anki.dev*}" ]; then
 	is_dev_device=true
 	rampost syscon.dfu -d | tee /dev/rampost.log
 else
-	is_dev_device=false
-	rampost syscon.dfu | tee /dev/rampost.log
+	is_dev_device=true
+	rampost syscon.dfu -d | tee /dev/rampost.log
 fi
 
-if [ -z "${CMDLINE##*dm=*}" ]; then
-	DM="${CMDLINE##*dm=\"}"
-	DM="${DM%\" *}"
-	DM_TABLE="${DM##*,}"
-	ROOTFS_OPTS="-o ro,noatime,noload,exec"
+# if [ -z "${CMDLINE##*dm=*}" ]; then
+#	 DM="${CMDLINE##*dm=\"}"
+#	 DM="${DM%\" *}"
+#	 DM_TABLE="${DM##*,}"
+#	 ROOTFS_OPTS="-o ro,noatime,noload,exec"
 
-	echo "Setting up DM Verity device: $DM"
-	dmsetup create system -r --table "$DM_TABLE" || fatal "ERROR: dmsetup failed"
-else
+#	 echo "Setting up DM Verity device: $DM"
+#	 dmsetup create system -r --table "$DM_TABLE" || fatal "ERROR: dmsetup failed"
+# else
 	set -e
 	ROOTFS_OPTS="-o ro,noatime,exec"
 	if ! $is_dev_device; then
 		rampost -x
 		exit 1;
 	fi
-fi
+# fi
 
 ROOT_MOUNT_POINT=/rootfs
 mkdir -p "$ROOT_MOUNT_POINT"
