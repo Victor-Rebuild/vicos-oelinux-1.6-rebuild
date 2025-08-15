@@ -4,9 +4,9 @@
 [submodule "anki/wired/vector-gobot"]
 	path = anki/wired/vector-gobot
 	url = https://github.com/kercre123/vector-gobot
-[submodule "anki/victor"]
-	path = anki/victor
-	url = https://github.com/Switch-modder/victor-1.6-rebuild
 [submodule "anki/dvcbs-reloaded"]
 	path = anki/dvcbs-reloaded
 	url = https://github.com/Switch-modder/dvcbs-reloaded
+[submodule "anki/victor"]
+	path = anki/victor
+	url = https://github.com/kercre123/victor
