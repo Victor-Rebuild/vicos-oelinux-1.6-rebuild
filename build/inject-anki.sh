@@ -11,16 +11,22 @@ fi
 
 if [[ ${PRODorOSKR} == "proddev" ]]; then
     export BUILD_TYPE=prod
+    export FINAL_BUILD_TYPE=
 elif [[ ${PRODorOSKR} == "epdev" ]]; then
     export BUILD_TYPE=prod
+    export FINAL_BUILD_TYPE=
 elif [[ ${PRODorOSKR} == "prod" ]]; then
     export BUILD_TYPE=prod
+    export FINAL_BUILD_TYPE=
 elif [[ ${PRODorOSKR} == "ep" ]]; then
     export BUILD_TYPE=prod
+    export FINAL_BUILD_TYPE=
 elif [[ ${PRODorOSKR} == "oskr" ]]; then
     export BUILD_TYPE=oskr
+    export FINAL_BUILD_TYPE=oskr
 elif [[ ${PRODorOSKR} == "dev" ]]; then
     export BUILD_TYPE=dev
+    export FINAL_BUILD_TYPE=d
 fi
 
 cd anki/victor-1.6
@@ -42,6 +48,6 @@ sudo rm -rf mounted/edits/anki -v
 sudo mv ../victor-1.6/_build/staging/Release/anki mounted/edits/anki -v
 sudo ./dvcbs-reloaded.sh -bt 1.6.1 $INCREMENT $BUILD_TYPE
 
-sudo mv mounted/* ../../_build/vicos-1.6.1.$INCREMENT.$PRODorOSKR.ota
+sudo mv mounted/* ../../_build/vicos-1.6.1.$INCREMENT$FINAL_BUILD_TYPE.ota
 
 cd ../../
