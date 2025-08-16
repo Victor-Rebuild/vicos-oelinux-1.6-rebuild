@@ -37,7 +37,7 @@ if [ -z "${CMDLINE##*anki.dev*}" ]; then
 else
 #	is_dev_device=true
 	rampost syscon.dfu | tee /dev/rampost.log
-# fi
+fi
 
 is_dev_device=true
 
