@@ -5,6 +5,8 @@ set -e
 if [[ ${RUN_FROM_MAIN} != "1" ]]; then
     echo "Don't run this standalone, this is supposed to tail off docker-ota-build or vm-ota-build"
     exit 1
+else
+    unset $RUN_FROM_MAIN
 fi
 
 if [[ ${PRODorOSKR} == "proddev" ]]; then
