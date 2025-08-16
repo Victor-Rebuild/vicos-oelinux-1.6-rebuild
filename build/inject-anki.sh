@@ -23,12 +23,6 @@ elif [[ ${PRODorOSKR} == "dev" ]]; then
     export BUILD_TYPE=dev
 fi
 
-if [[ ${DO_SIGN} == "1" ]]; then
-    if [[ ${PRODorOSKR} == "oskr" ]]; then
-        export BUILD_TYPE=oskrs
-    fi
-fi
-
 cd anki/victor-1.6
 
 echo "Cleaning victor before build"
