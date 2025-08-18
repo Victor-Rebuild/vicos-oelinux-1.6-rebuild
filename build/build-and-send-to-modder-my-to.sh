@@ -1,0 +1,141 @@
+#!/bin/bash
+
+EXPECTED_HASH_ELLIE="d454e1542f11d6432e24ced777faa285  -"
+
+echo "Hey, is this build going to the release or indev stack"
+echo -n "(Release/Indev): "
+read release_or_indev
+
+if [[ ${release_or_indev} == "Indev" ]]; then
+    echo "Build is a Indev build"
+    BUILD_STACK=indev
+elif [[ ${release_or_indev} == "Release" ]]; then
+    echo "Build is a Release build"
+    BUILD_STACK=release
+else
+    echo "Build type is not Release or Indev"
+    exit 1
+fi
+
+echo
+echo "What is this ota's version code?"
+echo
+echo "For Indev use a 4 digit format even if the build is only the 5th build"
+echo "Example: 5th Indev build is 0005"
+echo
+echo "For Release just add 1 to the last release number"
+echo "If the last release was 21 add 1 and you get 22, so type 22"
+echo
+echo -n "(Version Code?): "
+read version
+echo "Version code set to $version"
+echo
+
+VERSION_CODE=$version
+
+echo "Now, did you get permission from Ellie to send your builds to the server?"
+echo -n "(yes/no): "
+read ellie_or_not
+
+if [[ ${ellie_or_not} == "yes" ]]; then
+    echo "Prove it, what is the string that matches this checksum?"
+    echo -n "8310fec5a6dbe749296f01e9108e707b: "
+    read ellie_or_not_2
+    CONFIRM_IF_ELLIE=`echo -n $ellie_or_not_2 | md5sum`
+    echo
+    echo "Here's what you typed $ellie_or_not_2"
+    echo
+    echo "Here's what your answer's checksum came out to $CONFIRM_IF_ELLIE"
+    echo
+    if [[ ${CONFIRM_IF_ELLIE} == $EXPECTED_HASH_ELLIE ]]; then
+        echo "Alright Ellie, you can continue"
+    elif [[ ${CONFIRM_IF_ELLIE} != $EXPECTED_HASH_ELLIE ]]; then
+        echo "WRONG"
+        exit 1
+    else
+        echo "Didn't even try huh?"
+        exit 1
+    fi
+elif [[ ${ellie_or_not} == "no" ]]; then
+    echo "Then don't use this script"
+    exit 1
+else
+    echo "That's not a yes or no"
+    exit 1
+fi
+
+echo
+echo "Alright we need the passwords now, what's the prod boot password?"
+echo -n "(aka, the ABOOT/qtipri password): "
+read prod_boot_password
+
+if openssl rsa -in ota/qtipri.encrypted.key -passin pass:"$prod_boot_password" -noout 2>/dev/null; then
+    echo "Prod boot image key password confirmed to be correct!"
+else
+    echo
+    echo -e "\033[1;31mProd boot image signing password is incorrect. exiting.\033[0m"
+    echo -e "\033[1;31mHINT: we are using an older version of the key which has the same password as the ABOOT key\033[0m"
+    echo
+    exit 1
+fi
+
+echo
+echo "Prod password is good, now what's the oskr boot password?"
+echo -n "(aka, qtioskrpri password): "
+read oskr_boot_password
+
+if openssl rsa -in ota/qtioskrpri.encrypted.key -passin pass:"$oskr_boot_password" -noout 2>/dev/null; then
+    echo "OSKR boot image key password confirmed to be correct!"
+else
+    echo
+    echo -e "\033[1;31mOSKR boot image signing password is incorrect. exiting.\033[0m"
+    echo
+    exit 1
+fi
+
+echo
+echo "The boot image passwords seem fine, what is the ota password now?"
+echo -n "(aka, ota_prod.key): "
+read ota_password
+
+if openssl rsa -in ota/ota_prod.key -passin pass:"$ota_password" -noout 2>/dev/null; then
+    echo "OTA key password confirmed to be correct!"
+else
+    echo
+    echo -e "\033[1;31mOTA signing password is incorrect. exiting.\033[0m"
+    echo
+    exit 1
+fi
+
+echo
+echo "Just so we're clear, this is gonna build a dev, oskr and prod ota and send it to the $release_or_indev stack on modder.my.to"
+echo "Are we good with this?"
+echo -n "(yes/no): "
+read confirm_send
+
+if [[ ${confirm_send} == "yes" ]]; then
+    echo "Alright, better hope you have the root key at ~/modder-my-key"
+elif [[ ${confirm_send} == "no" ]]; then
+    echo "Alright bye!"
+else
+    echo "That's not a yes or no"
+    exit 1
+fi
+
+echo "Starting build"
+
+echo "Dev ota first"
+time ./build/docker-ota-build.sh dev $VERSION_CODE
+scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/dev/
+
+echo "Now for OSKR"
+time ./build/docker-ota-build.sh oskr $VERSION_CODE $oskr_boot_password
+scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/oskr/
+
+echo "And finally Prod"
+export DO_SIGN=1
+time ./build/docker-ota-build.sh proddev $VERSION_CODE $ota_password $prod_boot_password
+unset DO_SIGN
+scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/prod/
+
+echo "Done! Builds should be at https://modder.my.to/otas/1.6-rebuild/$BUILD_STACK/"
