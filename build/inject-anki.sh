@@ -39,8 +39,8 @@ echo "Building Victor"
 ./project/victor/scripts/stage.sh -c Release
 
 cd ../dvcbs-reloaded
-mkdir -p mounted/
-mv ../../_build/vicos-1.6.1.$INCREMENT*.ota mounted/ -v
+sudo mkdir -p mounted/
+sudo mv ../../_build/vicos-1.6.1.$INCREMENT*.ota mounted/ -v
 
 sudo ./dvcbs-reloaded.sh -m
 
