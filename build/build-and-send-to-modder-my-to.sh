@@ -2,6 +2,8 @@
 
 EXPECTED_HASH_ELLIE="d454e1542f11d6432e24ced777faa285  -"
 
+clear
+
 echo "Hey, is this build going to the release or indev stack"
 echo -n "(Release/Indev): "
 read release_or_indev
@@ -38,6 +40,7 @@ echo -n "(yes/no): "
 read ellie_or_not
 
 if [[ ${ellie_or_not} == "yes" ]]; then
+    echo
     echo "Prove it, what is the string that matches this checksum?"
     echo -n "8310fec5a6dbe749296f01e9108e707b: "
     read ellie_or_not_2
@@ -48,7 +51,7 @@ if [[ ${ellie_or_not} == "yes" ]]; then
     echo "Here's what your answer's checksum came out to $CONFIRM_IF_ELLIE"
     echo
     if [[ ${CONFIRM_IF_ELLIE} == $EXPECTED_HASH_ELLIE ]]; then
-        echo "Alright Ellie, you can continue"
+        echo "Alright fine, you can continue"
     elif [[ ${CONFIRM_IF_ELLIE} != $EXPECTED_HASH_ELLIE ]]; then
         echo "WRONG"
         exit 1
