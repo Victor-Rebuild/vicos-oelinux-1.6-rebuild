@@ -1,9 +1,6 @@
 [submodule "anki/vector-cloud"]
 	path = anki/vector-cloud
 	url = https://github.com/DDLBots/vector-cloud-fork
-[submodule "anki/dvcbs-reloaded"]
-	path = anki/dvcbs-reloaded
-	url = https://github.com/Switch-modder/dvcbs-reloaded
 [submodule "anki/victor"]
 	path = anki/victor
 	url = https://github.com/kercre123/victor
