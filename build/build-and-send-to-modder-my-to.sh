@@ -2,6 +2,8 @@
 
 EXPECTED_HASH_ELLIE="d454e1542f11d6432e24ced777faa285  -"
 
+unset DO_SIGN
+
 clear
 
 echo "Hey, is this build going to the release or indev stack"
