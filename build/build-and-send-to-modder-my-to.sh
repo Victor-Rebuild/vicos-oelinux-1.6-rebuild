@@ -87,6 +87,7 @@ read ota_password
 
 if openssl rsa -in ota/ota_prod.key -passin pass:"$ota_password" -noout 2>/dev/null; then
     echo "OTA key password confirmed to be correct!"
+    export OTA_PASS=$ota_password
 else
     echo
     echo -e "\033[1;31mOTA signing password is incorrect. exiting.\033[0m"
@@ -120,9 +121,12 @@ time ./build/docker-ota-build.sh oskr $VERSION_CODE $oskr_boot_password
 scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/oskr/
 
 echo "And finally Prod"
-export DO_SIGN=1
-time ./build/docker-ota-build.sh proddev $VERSION_CODE $ota_password $prod_boot_password
-unset DO_SIGN
+time ./build/docker-ota-build.sh proddev $VERSION_CODE $prod_boot_password
 scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/prod/
+
+echo
+echo "Unsetting variables"
+unset $VERSION_CODE $prod_boot_password $oskr_boot_password $OTA_PASS $ota_password
+echo
 
 echo "Done! Builds should be at https://modder.my.to/otas/1.6-rebuild/$BUILD_STACK/"
