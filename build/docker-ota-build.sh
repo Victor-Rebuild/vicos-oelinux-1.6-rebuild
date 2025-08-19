@@ -113,7 +113,7 @@ elif [[ ${PRODorOSKR} == "dev" ]]; then
     PERForUSER="-perf"
 elif [[ ${PRODorOSKR} == "proddev" ]]; then
     echo "Building a proddev image"
-    ToDo="build-victor-robot-perf-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
+    ToDo="build-victor-robot-proddev-image && export IMG_DIR=../poky/build/tmp-glibc/deploy/images/apq8009-robot-robot-perf && cd ~/vicos-oelinux/ota && export BOOT_IMAGE_SIGNING_PASSWORD=$BOOT_SIGNING_PASSWORD && make prodsign"
     ADEV=0
     check_sign_prod
     OTA_NAME=vicos-$(cat ANKI_VERSION).${INCREMENT}.ota

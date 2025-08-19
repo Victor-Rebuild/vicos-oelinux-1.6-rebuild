@@ -2,6 +2,9 @@
 ## https://modder.my.to/otas/1.6-rebuild/indev/
 ## If you want to use 1.6-rebuild do NOT use these images, use the release ones instead
 
+## 1.6.1.0003
+Add a seperate proddev bitbake option, use different ramposts to confirm that we can have build specific ramposts
+
 ## 1.6.1.0002
 Fixed the prod boot images so that they boot again, add new 1.6-rebuild rampost images
 
@@ -9,4 +12,4 @@ Fixed the prod boot images so that they boot again, add new 1.6-rebuild rampost 
 Wired works fully works, PicoVoice wakeword training works, changed OSKR messages to ankidevunit
 
 ## 1.6.1.0000
-Dev only, first ota run
+Dev only, first ota run, basically plain vicos-oelinux-nosign
