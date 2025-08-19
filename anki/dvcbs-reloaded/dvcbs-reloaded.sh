@@ -92,21 +92,6 @@ fi
 fi
 }
 
-function checkforandgenkey()
-{
-if [ ! -d ${keyfo} ]; then
-    mkdir ${keyfo}
-fi
-if [ ! -f ${keyfo}/ota.pub ]; then
-    echo "Private key not found! Generating one..."
-    openssl genrsa -out ${keyfo}/ota.pem 2048
-    echo "Generated in ${keyfo}/ota.pem. Now getting public key..."
-    openssl rsa -in ${keyfo}/ota.pem -outform PEM -pubout -out ${keyfo}/ota.pub
-    echo "Public key now in ${keyfo}/ota.pub! SCP this to /data/etc/ota_keys in your OSKR bot so he can use this OTA!"
-    echo "Do NOT share your ota.pem! Only share your ota.pub!"
-fi
-}
-
 function parsedirbuild()
 {
 if [ -z "${origdir}" ]; then
@@ -293,12 +278,6 @@ function copyfull()
 	mount -o loop,rw,sync ${dir}apq8009-robot-sysfs.img ${dir}edits
   fi
   fi
-  if grep -q "cryptsetup" ${dir}edits/etc/initscripts/mount-data; then
-     if [ ${BUILD_TYPE} == "orange" ]; then
-        echo "This initscript contains cryptsetup, but this kernel doesn't support that. Exiting."
-        exit 0
-     fi
-  fi
   echo "Putting build info into build.prop and /etc"
   cp -rp ${refo}/build.prop ${dir}edits/
   echo ro.anki.product.name=Vector >> ${dir}edits/build.prop
@@ -315,12 +294,6 @@ function copyfull()
   echo ro.build.type=development >> ${dir}edits/build.prop
   echo ro.build.version.incremental=${code} >> ${dir}edits/build.prop
   echo ro.build.user=root >> ${dir}edits/build.prop
-
-  if [ ${BUILD_TYPE} == dvt2 ]; then
-     echo ro.build.target=5 >> ${dir}edits/build.prop
-  else
-     echo ro.build.target=${BUILD_TYPE} >> ${dir}edits/build.prop
-  fi
 
   if [ ${BUILD_TYPE} == oskrs ]; then
      echo ID="msm-perf" > ${dir}edits/etc/os-release
@@ -347,46 +320,7 @@ function copyfull()
   echo ${base}.${code}${BUILD_SUFFIX} > ${dir}edits/etc/os-version
   echo ${base} > ${dir}edits/etc/os-version-base
   echo ${code} > ${dir}edits/etc/os-version-code
-  echo "Putting in correct kernel modules"
-  rm -rf ${dir}edits/usr/lib/modules
-  cp -r ${refo}/modules/${BUILD_TYPE}/modules ${dir}edits/usr/lib/
-  chmod -R +rwx ${dir}edits/usr/lib/modules
-  echo "Putting in new update-engine for installing both signed and unsigned firmwares (Stored at /anki/bin/update-engine)"
-  cp ${refo}/update-engines/update-engine ${dir}edits/anki/bin/update-engine
-  # echo "Putting in update-engine to install signed builds later if you want (Stored at /anki/bin/update-engine-signed)"
-  # cp ${refo}/update-engines/update-engine-signed ${dir}edits/anki/bin/update-engine-signed
-  chmod +rwx ${dir}edits/anki/bin/update-engine
-  # chmod +rwx ${dir}edits/anki/bin/update-engine-signed
-  echo "Adding ssh_root_key (Obtain at https://modder.my.to/ssh_root_key)"
-  cp ${refo}/add-ssh-root-key.sh ${dir}edits/etc/init.d/localsshuser.sh
-  if [ ! -f ${dir}edits/anki/bin/vic-log-event ]; then
-     echo "This doesn't contain vic-log-event which is required for update-engine to work. Maybe you are messing with older vicos. Copying it in."
-     cp ${refo}/vic-log-event ${dir}edits/anki/bin/
-     chmod +rwx ${dir}edits/anki/bin/vic-log-event
-  fi
-  if [ ! -f ${dir}edits/anki/etc/update-engine.env ]; then
-     echo "No update-engine.env. This anki folder must be really old! Copying one in."
-     cp ${refo}/update-engine.env ${dir}edits/anki/etc/
-  fi
-  if [ -f ${dir}edits/etc/ssh/authorized_keys ]; then
-     if grep -q "victor" ${dir}edits/etc/ssh/authorized_keys; then
-        echo "This build has a global ssh_root_key, and will not accept an oskr bot specific one. You can get the key here: https://wire.my.to/evresources/ssh_root_key"
-     fi
-  else
-     echo "No authorized_keys."
-  fi
-  echo "Putting in your OTA signing key. Original ota.pub will be left in as a backup as /anki/etc/anki.pub."
-  if [ ! -f ${dir}edits/anki/etc/anki.pub ]; then
-    if [ -f ${dir}edits/anki/etc/ota.pub ]; then
-  mv ${dir}edits/anki/etc/ota.pub ${dir}edits/anki/etc/anki.pub
-  fi
-fi
-  cp ${keyfo}/ota.pub ${dir}edits/anki/etc/ota.pub
-#  if [ -f ${dir}edits/anki/data/assets/cozmo_resources/config/server_config.json ]; then
-#  echo "Putting in a modern server config"
-#  cp ${refo}/server_config.json ${dir}edits/anki/data/assets/cozmo_resources/config/server_config.json
-#fi
-  cp ${refo}/boots/${BUILD_TYPE}.img.gz ${refo}/apq8009-robot-boot.img.gz
+  cp ../../_build/apq8009-robot-boot.img.gz.enc ${refo}/apq8009-robot-boot.img.gz
 }
 
 function mountota()
@@ -496,31 +430,6 @@ if [ $# -gt 0 ]; then
             parsedirmount
 	    mountota
 	    ;;
-	-dmOSKR) 
-	    downloadmountoskr
-	    dir=mounted/
-	    mountota
-	    ;;
-	-dmDEV) 
-	    downloadmountdev
-	    dir=mounted/
-	    mountota
-	    ;;
-	-dmDVT2) 
-	    downloadmountdvt2
-	    dir=mounted/
-	    mountota
-	    ;;
-	-dmDVT3) 
-	    downloadmountdvt3
-	    dir=mounted/
-	    mountota
-	    ;;
-	-dmLEGACY) 
-	    downloadmountlegacy
-	    dir=mounted/
-	    mountota
-	    ;;
 	-b) 
 	    base=$2
 	    code=$3
@@ -528,7 +437,6 @@ if [ $# -gt 0 ]; then
 	    BUILD_TYPE=oskr
 	    BUILD_SUFFIX=oskr
 	    precheck
-      checkforandgenkey
 	    parsedirbuild
 	    copyfull
 	    buildcustomandsign
@@ -540,124 +448,23 @@ if [ $# -gt 0 ]; then
 	    origdir=$5
 	    checktype
 	    precheck
-      checkforandgenkey
 	    parsedirbuild
 	    copyfull
 	    buildcustomandsign
 	    ;;
-  -mbt)
-      base=$2
-      code=$3
-      BUILD_TYPE=$4
-      origdir=$5
-      parsedirmount
-      mountota
-      checktype
-      precheck
-      checkforandgenkey
-      parsedirbuild
-      copyfull
-      buildcustomandsign
-      ;;
-  -bf)
-      #wire's command
-      # TODO: copy robot image instead of full ota to each folder. it may be a little more messy down here but it would save time.
-      echo "This is the command used by Wire to build OTAs. It is recommended you use the -b or -bt command as this builds the OTA you provide for every single target."
-      base=$2
-      code=$3
-      origdir=$4
-      BUILD_TYPE=oskr
-      branch=$5
-      if [ -z ${branch} ]; then
-         echo "Provide a branch; test, unstable, stable"
-         exit 0
-      fi
-      checktype
-      precheck
-      checkforandgenkey
-      parsedirbuild
-      copyfull
-      cp ${refo}/update-engine.env ${dir}edits/anki/etc/
-      echo UPDATE_ENGINE_BASE_URL=http://wire.my.to:81/oskr-stable/ >> ${dir}edits/anki/etc/update-engine.env
-      echo UPDATE_ENGINE_BASE_URL_LATEST=http://wire.my.to:81/oskr-unstable/ >> ${dir}edits/anki/etc/update-engine.env
-      buildcustomandsign
-      echo "Doing versioning stuff for ./upload.sh"
-      if [ ${branch} == stable ]; then
-      if [ -f ${dir}version ]; then
-        if [ -f ${dir}lastversion ]; then
-          rm -f ${dir}lastversion
-        fi
-        mv ${dir}version ${dir}lastversion
-        sed -i 's/currentbase/lastbase/g' ${dir}lastversion
-        sed -i 's/currentcode/lastcode/g' ${dir}lastversion
-      fi
-        echo "Echoing base and code to ${dir}version"
-        echo currentbase=${base} > ${dir}version
-        echo currentcode=${code} >> ${dir}version
-      fi
-      #echo currentbase=${base} > ${dir}version
-      #echo currentcode=${code} >> ${dir}version
-      if [ ! -d all/oskrfinal ]; then
-        mkdir -p all/oskrfinal
-      fi
-      if [ ! -d all/whiskeyfinal ]; then
-        mkdir -p all/whiskeyfinal
-      fi
-      if [ ! -d all/devfinal ]; then
-        mkdir -p all/devfinal
-      fi
-      if [ ! -d all/oskrnsfinal ]; then
-        mkdir -p all/oskrnsfinal
-      fi
-      rm -rf all/oskrfinal/*
-      rm -rf all/whiskeyfinal/*
-      rm -rf all/devfinal/*
-      rm -rf all/oskrnsfinal/*
-      cp ${dir}*.ota all/oskrfinal/
-      cp ${dir}*.ota all/whiskeyfinal/
-      cp ${dir}*.ota all/devfinal/
-      cp ${dir}*.ota all/oskrnsfinal/
-      origdir=all/whiskeyfinal/
-      BUILD_TYPE=whiskey
-      parsedirmount
-      mountota
-      checktype
-      precheck
-      checkforandgenkey
-      parsedirbuild
-      copyfull
-      cp ${refo}/update-engine.env ${dir}edits/anki/etc/
-      echo UPDATE_ENGINE_BASE_URL=http://wire.my.to:81/whiskey-stable/ >> ${dir}edits/anki/etc/update-engine.env
-      echo UPDATE_ENGINE_BASE_URL_LATEST=http://wire.my.to:81/whiskey-unstable/ >> ${dir}edits/anki/etc/update-engine.env
-      buildcustomandsign
-      origdir=all/devfinal/
-      BUILD_TYPE=dev
-      parsedirmount
-      mountota
-      checktype
-      precheck
-      checkforandgenkey
-      parsedirbuild
-      copyfull
-      cp ${refo}/update-engine.env ${dir}edits/anki/etc/
-      echo UPDATE_ENGINE_BASE_URL=http://wire.my.to:81/dev-stable/ >> ${dir}edits/anki/etc/update-engine.env
-      echo UPDATE_ENGINE_BASE_URL_LATEST=http://wire.my.to:81/dev-unstable/ >> ${dir}edits/anki/etc/update-engine.env
-      buildcustomandsign
-      origdir=all/oskrnsfinal/
-      BUILD_TYPE=oskrns
-      parsedirmount
-      mountota
-      checktype
-      precheck
-      checkforandgenkey
-      parsedirbuild
-      copyfull
-      cp ${refo}/update-engine.env ${dir}edits/anki/etc/
-      echo UPDATE_ENGINE_BASE_URL=http://wire.my.to:81/oskrns-stable/ >> ${dir}edits/anki/etc/update-engine.env
-      echo UPDATE_ENGINE_BASE_URL_LATEST=http://wire.my.to:81/oskrns-unstable/ >> ${dir}edits/anki/etc/update-engine.env
-      buildcustomandsign
-      echo "All builds are done. ./all"
-      ;;
+    -mbt)
+        base=$2
+        code=$3
+        BUILD_TYPE=$4
+        origdir=$5
+        parsedirmount
+        mountota
+        checktype
+        precheck
+        parsedirbuild
+        copyfull
+        buildcustomandsign
+        ;;
 	*)
 	    help
 	    ;;

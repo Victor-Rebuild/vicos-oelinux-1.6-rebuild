@@ -2,6 +2,9 @@
 ## https://modder.my.to/otas/1.6-rebuild/indev/
 ## If you want to use 1.6-rebuild do NOT use these images, use the release ones instead
 
+## 1.6.1.0005 (2025/08/19)
+Don't copy in prebuilt ramposts and modules, use the one made with the ota, remove unneeded stuff from dvcbs-reloaded to hopefully cut down repo size a little, fix dynamic cpu speed on Vector 2.0 by updating Victor commit to [dd358480a177c6fa6d9a78dcd18a51900b806bb4](https://github.com/Switch-modder/victor-1.6-rebuild/commit/dd358480a177c6fa6d9a78dcd18a51900b806bb4)
+
 ## 1.6.1.0004 (2025/08/19)
 Actually make the new different ramposts apply, don't clean anki every rebuild since cmake should be able to figure out what it needs to recompile should it have to happen
 
