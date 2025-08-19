@@ -42,25 +42,7 @@ echo -n "(yes/no): "
 read ellie_or_not
 
 if [[ ${ellie_or_not} == "yes" ]]; then
-    echo
-    echo "Prove it, what is the string that matches this checksum?"
-    echo -n "8310fec5a6dbe749296f01e9108e707b: "
-    read ellie_or_not_2
-    CONFIRM_IF_ELLIE=`echo -n $ellie_or_not_2 | md5sum`
-    echo
-    echo "Here's what you typed $ellie_or_not_2"
-    echo
-    echo "Here's what your answer's checksum came out to $CONFIRM_IF_ELLIE"
-    echo
-    if [[ ${CONFIRM_IF_ELLIE} == $EXPECTED_HASH_ELLIE ]]; then
-        echo "Alright fine, you can continue"
-    elif [[ ${CONFIRM_IF_ELLIE} != $EXPECTED_HASH_ELLIE ]]; then
-        echo "WRONG"
-        exit 1
-    else
-        echo "Didn't even try huh?"
-        exit 1
-    fi
+    echo "Alright fine, you can continue"
 elif [[ ${ellie_or_not} == "no" ]]; then
     echo "Then don't use this script"
     exit 1
