@@ -388,7 +388,7 @@ function buildcustomandsign()
   fi
   if [ ${BUILD_TYPE} == "oskrs" ] || [ ${BUILD_TYPE} == "prod" ]; then
      echo "Signing manifest.ini"
-     openssl dgst -sha256 -sign ${refo}/ota_prod.key -passin pass:"$OTA_PASS" -out ${refo}/manifest.sha256 ${refo}/manifest.ini
+     openssl dgst -sha256 -sign ${refo}/ota_prod.key -out ${refo}/manifest.sha256 ${refo}/manifest.ini
   else
      echo "Not signing because build type is not oskrs."
   fi
