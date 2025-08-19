@@ -32,7 +32,7 @@ fi
 cd anki/victor-1.6
 
 echo "Cleaning victor before build"
-rm -rf _build EXTERNALS
+rm -rf _build
 
 echo "Building Victor"
 ./wire/build-d.sh
