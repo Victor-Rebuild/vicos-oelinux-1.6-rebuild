@@ -12,6 +12,7 @@ inherit systemd
 do_install_append () {
    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d ${D}${systemd_unitdir}/system/
+       install -m 0644 ${WORKDIR}/${SERVICE_FILE} -D ${D}${systemd_unitdir}/system/${SERVICE_FILE}
    fi
 }
 
@@ -44,7 +45,6 @@ do_install () {
     install -d ${D}/usr/lib
     install -d ${D}/etc/wired
     install -p -m 0755 ${WORKSPACE}/anki/wired/build/wired ${D}/usr/bin/
-    install -m 0644 ${WORKSPACE}/anki/wired/${SERVICE_FILE} -D ${D}${systemd_unitdir}/system/${SERVICE_FILE}
     install -m 0755 ${WORKSPACE}/anki/wired/build/libvector-gobot.so ${D}/usr/lib/libvector-gobot.so
     cp -R --no-dereference --preserve=mode,links -v ${WORKSPACE}/anki/wired/webroot ${D}/etc/wired/webroot
 }
