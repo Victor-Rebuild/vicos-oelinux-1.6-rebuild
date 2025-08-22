@@ -2,6 +2,8 @@
 ## https://modder.my.to/otas/1.6-rebuild/indev/
 ## If you want to use 1.6-rebuild do NOT use these images, use the release ones instead
 
+## 1.6.1.0009 (2025/08/XX)
+
 ## 1.6.1.0008 (2025/08/20)
 Wired broke due to it calling for /usr/bin/sleep and not /bin/sleep, this ota is just a fix for that
 

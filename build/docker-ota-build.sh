@@ -158,7 +158,7 @@ docker build --build-arg UID=$(id -u $USER) --build-arg GID=$(id -g $USER) -t vi
 
 docker run ${BUILD_ARGS_TERM} \
 	-v "$(pwd):/home/build/vicos-oelinux" \
-	victor-oe-builder bash -c "cd ~/vicos-oelinux && ./build/deps.sh"
+	victor-oe-builder bash -c "cd ~/vicos-oelinux && ./build/deps.sh && ./build/get-victor.sh"
 
 docker run ${BUILD_ARGS_TERM} \
     -v "$(pwd):/home/build/vicos-oelinux" \
