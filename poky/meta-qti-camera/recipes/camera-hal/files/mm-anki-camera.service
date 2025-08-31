@@ -5,7 +5,7 @@ Wants=mm-qcamera-daemon.service
 
 [Service]
 Restart=always
-ExecStart=/usr/bin/mm-anki-camera $MM_ANKI_CAMERA_OPTS
+ExecStart=/usr/bin/mm-anki-camera -r 1 $MM_ANKI_CAMERA_OPTS
 Group=camera
 UMask=0007
 
