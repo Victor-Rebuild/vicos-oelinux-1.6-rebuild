@@ -43,6 +43,18 @@ sudo ./dvcbs-reloaded.sh -m
 
 sudo rm -rf mounted/edits/anki -v
 sudo mv ../victor-1.6/_build/staging/Release/anki mounted/edits/anki -v
+
+if [[ ${BUILD_STACK} == "indev" ]]; then
+    echo "Build is a Indev build"
+    sudo touch mounted/edits/etc/rebuild-indev
+elif [[ ${BUILD_STACK} == "release" ]]; then
+    echo "Build is a Release build"
+    sudo touch mounted/edits/etc/rebuild-release
+else
+    echo "Not built from build and send script, assuming indev"
+    sudo touch mounted/edits/etc/rebuild-indev
+fi
+
 sudo ./dvcbs-reloaded.sh -bt 1.6.1 $INCREMENT $BUILD_TYPE
 
 sudo mv mounted/* ../../_build/vicos-1.6.1.$INCREMENT$FINAL_BUILD_TYPE.ota
