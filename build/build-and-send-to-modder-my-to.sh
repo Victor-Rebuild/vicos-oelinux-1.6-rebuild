@@ -125,6 +125,11 @@ time ./build/docker-ota-build.sh proddev $VERSION_CODE $prod_boot_password
 scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/prod/
 
 echo
+echo "Setting version as latest"
+echo 1.6.1.$VERSION_CODE > latest
+scp -P 44 -i ~/modder-my-key latest raj-jyot@modder.my.to:/media/raj-jyot/modder-my-to/webserver/otas/1.6-rebuild/$BUILD_STACK/latest
+
+echo
 echo "Unsetting variables"
 unset $VERSION_CODE $prod_boot_password $oskr_boot_password $OTA_PASS $ota_password $BUILD_STACK
 echo
