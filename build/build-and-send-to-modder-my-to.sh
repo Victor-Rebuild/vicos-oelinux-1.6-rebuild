@@ -12,10 +12,10 @@ read release_or_indev
 
 if [[ ${release_or_indev} == "Indev" ]]; then
     echo "Build is a Indev build"
-    BUILD_STACK=indev
+    export BUILD_STACK=indev
 elif [[ ${release_or_indev} == "Release" ]]; then
     echo "Build is a Release build"
-    BUILD_STACK=release
+    export BUILD_STACK=release
 else
     echo "Build type is not Release or Indev"
     exit 1
@@ -126,7 +126,7 @@ scp -P 44 -i ~/modder-my-key _build/*.ota raj-jyot@modder.my.to:/media/raj-jyot/
 
 echo
 echo "Unsetting variables"
-unset $VERSION_CODE $prod_boot_password $oskr_boot_password $OTA_PASS $ota_password
+unset $VERSION_CODE $prod_boot_password $oskr_boot_password $OTA_PASS $ota_password $BUILD_STACK
 echo
 
 echo "Done! Builds should be at https://modder.my.to/otas/1.6-rebuild/$BUILD_STACK/"
